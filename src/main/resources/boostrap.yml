@@ -1,0 +1,12 @@
+#spring:
+#  application:
+#    # This name needs to match the name in the GitHub config file, if no name under cloud's config section is defined
+#    name: post-reply-service
+#  profiles:
+#    active: dev # user-service-dev.yml(highest priority), commons-dev.yml(yea, able able to access this too)
+#
+#  cloud:
+#    config:
+#      uri: http://localhost:8888
+#      label: main
+#      name: post-service
