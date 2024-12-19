@@ -15,7 +15,7 @@ use this token for now (since we aren't going to startup config server, user pro
 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInVzZXJJZCI6MywiZW1haWwiOiJhbGljZS5qQGV4YW1wbGUuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3MzQ1MjE5NDl9.7_5dfcY2dMQ0lSbzlnsrHNISzq-NLhdnMx9fEpxcW0o
 */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/posts")
 public class SecurityTestingController {
 
     /*display the Authentication object within Security context*/

@@ -3,6 +3,7 @@ package com.example.postreply.controller;
 import com.example.postreply.model.Post;
 import com.example.postreply.security.UserPrinciple;
 import com.example.postreply.service.PostService;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,6 +11,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import com.example.postreply.security.JwtUtil;
+
 
 import java.util.List;
 
@@ -21,6 +24,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    public void setJwtUtil(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Autowired
     private PostService postService;
@@ -30,11 +39,15 @@ public class PostController {
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
         UserPrinciple userPrinciple = getUserIdFromJWT();
         Long userId = userPrinciple.getUserId();
+        String username = userPrinciple.getUsername(); // 从 UserPrinciple 获取用户名
+
         post.setUserId(userId);
-        // 初始状态为 Unpublished
-        post.setStatus("Unpublished");
+        post.setUsername(username); // 设置用户名
+        post.setStatus("Unpublished"); // 初始状态为 Unpublished
+
         return ResponseEntity.ok(postService.createPost(post));
     }
+
     @GetMapping
     public ResponseEntity<List<Post>> getVisiblePosts() {
 
@@ -170,30 +183,30 @@ public class PostController {
         return ResponseEntity.ok(myPosts);
     }
 
-//获取当前用户id
-@GetMapping("/current-user-id")
-public ResponseEntity<Long> getCurrentUserId() {
-    // 从认证上下文中获取用户 ID
-    UserPrinciple userPrinciple = getUserIdFromJWT();
-    Long userId = userPrinciple.getUserId();
+    //获取当前用户id
+    @GetMapping("/current-user-id")
+    public ResponseEntity<Long> getCurrentUserId() {
+        // 从认证上下文中获取用户 ID
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long userId = userPrinciple.getUserId();
 
-    // 返回用户 ID
-    return ResponseEntity.ok(userId);
-}
-
-//获取指定帖子的userid
-@GetMapping("/{postId}/user-id")
-public ResponseEntity<Long> getPostUserId(@PathVariable String postId) {
-    Post post = postService.getPostById(postId);
-
-    // 检查帖子是否存在
-    if (post == null) {
-        return ResponseEntity.notFound().build();
+        // 返回用户 ID
+        return ResponseEntity.ok(userId);
     }
 
-    // 返回帖子的 userId
-    return ResponseEntity.ok(post.getUserId());
-}
+    //获取指定帖子的userid
+    @GetMapping("/{postId}/user-id")
+    public ResponseEntity<Long> getPostUserId(@PathVariable String postId) {
+        Post post = postService.getPostById(postId);
+
+        // 检查帖子是否存在
+        if (post == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // 返回帖子的 userId
+        return ResponseEntity.ok(post.getUserId());
+    }
 
     // ========== 私有辅助方法 ==========
 
@@ -202,10 +215,34 @@ public ResponseEntity<Long> getPostUserId(@PathVariable String postId) {
         return (UserPrinciple) authentication.getPrincipal();
     }
 
+//    private boolean checkIfAdminRole() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+//    }
+
     private boolean checkIfAdminRole() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        try {
+            // 获取当前 Authentication 对象
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            // 检查 authentication 是否为空
+            if (authentication == null || !(authentication.getPrincipal() instanceof UserPrinciple)) {
+                System.err.println("Authentication 为空或 Principal 非 UserPrinciple 类型");
+                return false;
+            }
+
+            // 从 Principal 中获取 UserPrinciple
+            UserPrinciple principal = (UserPrinciple) authentication.getPrincipal();
+
+            // 获取 role 并检查是否为 ADMIN
+            String role = principal.getRole();
+            return "ADMIN".equals(role);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
+
 
     // 如果有 super admin 角色，则实现此方法，如无则可忽略
     private boolean checkIfSuperAdminRole() {

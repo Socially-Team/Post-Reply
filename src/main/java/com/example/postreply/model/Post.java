@@ -20,6 +20,7 @@ public class Post {
 
     // 其他字段
     private Long userId;
+    private String username;
     private String title;
     private String content;
     private Boolean isArchived = false;
@@ -45,6 +46,14 @@ public class Post {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username; // 新增 getter 方法
+    }
+
+    public void setUsername(String username) {
+        this.username = username; // 新增 setter 方法
     }
 
     public String getTitle() {
@@ -122,6 +131,7 @@ public class Post {
     // Nested Class: PostReply
     public static class PostReply {
         private Long userId;        // ID of the user who replied
+        private String username;
         private String comment;     // Content of the reply
         private Boolean isActive = true; // Logical delete flag
         private Date dateCreated = new Date(); // Reply creation date
@@ -134,6 +144,14 @@ public class Post {
 
         public void setUserId(Long userId) {
             this.userId = userId;
+        }
+
+        public String getUsername() {
+            return username; // 新增 getter 方法
+        }
+
+        public void setUsername(String username) {
+            this.username = username; // 新增 setter 方法
         }
 
         public String getComment() {
@@ -171,6 +189,7 @@ public class Post {
         // Nested Class: SubReply
         public static class SubReply {
             private Long userId;    // ID of the user who replied
+            private String username;
             private String comment; // Content of the sub-reply
             private Boolean isActive = true; // Logical delete flag
             private Date dateCreated = new Date(); // Sub-reply creation date
@@ -182,6 +201,14 @@ public class Post {
 
             public void setUserId(Long userId) {
                 this.userId = userId;
+            }
+
+            public String getUsername() {
+                return username; // 新增 getter 方法
+            }
+
+            public void setUsername(String username) {
+                this.username = username; // 新增 setter 方法
             }
 
             public String getComment() {
