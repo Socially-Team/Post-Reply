@@ -10,11 +10,6 @@
 //@Configuration
 //public class WebConfig  implements WebMvcConfigurer {
 //
-////    /*passwordEncoder put here - to avoid circular dependencies between SecurityConfig and UserService*/
-////    @Bean
-////    public PasswordEncoder passwordEncoder(){
-////        return new BCryptPasswordEncoder();
-////    }
 //
 //
 //    @Override
