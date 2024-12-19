@@ -1,0 +1,212 @@
+{
+	"info": {
+		"_postman_id": "212d3f65-b461-4101-97a3-4b457398402b",
+		"name": "Post&Reply via API gateway",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33336917"
+	},
+	"item": [
+		{
+			"name": "get a new post",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInVzZXJJZCI6MywiZW1haWwiOiJhbGljZS5qQGV4YW1wbGUuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3MzQ1MjE5NDl9.7_5dfcY2dMQ0lSbzlnsrHNISzq-NLhdnMx9fEpxcW0o",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/api/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post new post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"My Post\",\n  \"content\": \"This is the content of the post.\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_GATEWAY_URL}}/api/posts",
+					"host": [
+						"{{API_GATEWAY_URL}}"
+					],
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "see all posts this user can",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_GATEWAY_URL}}/api/posts",
+					"host": [
+						"{{API_GATEWAY_URL}}"
+					],
+					"path": [
+						"api",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all published posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_GATEWAY_URL}}/api/posts/published",
+					"host": [
+						"{{API_GATEWAY_URL}}"
+					],
+					"path": [
+						"api",
+						"posts",
+						"published"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get post by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_GATEWAY_URL}}/api/posts/6763c057e36c942f122cca71",
+					"host": [
+						"{{API_GATEWAY_URL}}"
+					],
+					"path": [
+						"api",
+						"posts",
+						"6763c057e36c942f122cca71"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set pulished",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{API_GATEWAY_URL}}/api/posts/6763c057e36c942f122cca71/status?status=Published",
+					"host": [
+						"{{API_GATEWAY_URL}}"
+					],
+					"path": [
+						"api",
+						"posts",
+						"6763c057e36c942f122cca71",
+						"status"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "Published"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all my posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_GATEWAY_URL}}/api/posts/my-posts",
+					"host": [
+						"{{API_GATEWAY_URL}}"
+					],
+					"path": [
+						"api",
+						"posts",
+						"my-posts"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsInVzZXJJZCI6MywiZW1haWwiOiJhbGljZS5qQGV4YW1wbGUuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3MzQ1MjE5NDl9.7_5dfcY2dMQ0lSbzlnsrHNISzq-NLhdnMx9fEpxcW0o",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
