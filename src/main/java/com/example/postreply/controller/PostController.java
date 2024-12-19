@@ -1,6 +1,7 @@
 package com.example.postreply.controller;
 
 import com.example.postreply.model.Post;
+import com.example.postreply.security.UserPrinciple;
 import com.example.postreply.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 //@CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -26,7 +28,8 @@ public class PostController {
     // 创建新帖子（未发布状态），由用户创建
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        Long userId = getUserIdFromJWT();
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long userId = userPrinciple.getUserId();
         post.setUserId(userId);
         // 初始状态为 Unpublished
         post.setStatus("Unpublished");
@@ -34,7 +37,9 @@ public class PostController {
     }
     @GetMapping
     public ResponseEntity<List<Post>> getVisiblePosts() {
-        Long userId = getUserIdFromJWT();
+
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long userId = userPrinciple.getUserId();
         boolean isAdmin = checkIfAdminRole();
         boolean isSuperAdmin = checkIfSuperAdminRole(); // 若已有superAdmin逻辑则可利用，无则可省略此行
 
@@ -44,7 +49,7 @@ public class PostController {
         // 使用canViewPost(post)过滤用户可见的帖子
         List<Post> visiblePosts = allPosts.stream()
                 .filter(this::canViewPost) // canViewPost是你之前实现的私有方法，用于检查单个帖子可见性
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(visiblePosts);
     }
@@ -70,8 +75,8 @@ public class PostController {
     // 更新帖子状态，需要根据状态、角色和规则判断
     @PutMapping("/{postId}/status")
     public ResponseEntity<Post> updatePostStatus(@PathVariable String postId, @RequestParam String status) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long currentUserId = getUserIdFromJWT();
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long currentUserId = userPrinciple.getUserId();
         boolean isAdmin = checkIfAdminRole();
         boolean isSuperAdmin = checkIfSuperAdminRole(); // 假设需要的话，可实现checkIfSuperAdminRole
 
@@ -114,7 +119,8 @@ public class PostController {
             @PathVariable String postId,
             @RequestBody Map<String, Object> updates) {
 
-        Long userId = getUserIdFromJWT();
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long userId = userPrinciple.getUserId();
         boolean isAdmin = checkIfAdminRole();
 
         Post updatedPost = postService.updatePostFields(postId, updates, userId, isAdmin);
@@ -125,7 +131,8 @@ public class PostController {
 
     @GetMapping("/unpublished-hidden")
     public ResponseEntity<List<Post>> getUnpublishedAndHiddenPosts() {
-        Long currentUserId = getUserIdFromJWT();
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long currentUserId = userPrinciple.getUserId();
         boolean isAdmin = checkIfAdminRole();
 
         // 从数据库获取所有帖子
@@ -143,7 +150,7 @@ public class PostController {
                                 ("Unpublished".equals(post.getStatus()) || "Hidden".equals(post.getStatus())));
                     }
                 })
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(filteredPosts);
     }
@@ -152,12 +159,13 @@ public class PostController {
     //返回所有自己发的帖子
     @GetMapping("/my-posts")
     public ResponseEntity<List<Post>> getMyPosts() {
-        Long currentUserId = getUserIdFromJWT();
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long currentUserId = userPrinciple.getUserId();
 
         // 从数据库获取所有帖子并过滤当前用户创建的帖子
         List<Post> myPosts = postService.findAll().stream()
                 .filter(post -> currentUserId.equals(post.getUserId()))
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(myPosts);
     }
@@ -166,7 +174,8 @@ public class PostController {
 @GetMapping("/current-user-id")
 public ResponseEntity<Long> getCurrentUserId() {
     // 从认证上下文中获取用户 ID
-    Long userId = getUserIdFromJWT();
+    UserPrinciple userPrinciple = getUserIdFromJWT();
+    Long userId = userPrinciple.getUserId();
 
     // 返回用户 ID
     return ResponseEntity.ok(userId);
@@ -188,9 +197,9 @@ public ResponseEntity<Long> getPostUserId(@PathVariable String postId) {
 
     // ========== 私有辅助方法 ==========
 
-    private Long getUserIdFromJWT() {
+    private UserPrinciple getUserIdFromJWT() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (Long) authentication.getPrincipal();
+        return (UserPrinciple) authentication.getPrincipal();
     }
 
     private boolean checkIfAdminRole() {
@@ -206,7 +215,9 @@ public ResponseEntity<Long> getPostUserId(@PathVariable String postId) {
 
     // 判断用户是否可以查看帖子
     private boolean canViewPost(Post post) {
-        Long currentUserId = getUserIdFromJWT();
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long currentUserId = userPrinciple.getUserId();
+//        Long currentUserId = getUserIdFromJWT();
         boolean isAdmin = checkIfAdminRole();
 
         switch (post.getStatus()) {
