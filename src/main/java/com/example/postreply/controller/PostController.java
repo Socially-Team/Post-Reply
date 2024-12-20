@@ -208,6 +208,39 @@ public class PostController {
         return ResponseEntity.ok(post.getUserId());
     }
 
+
+    @GetMapping("/top-3-posts")
+    public ResponseEntity<List<Post>> getTop3PublishedPosts() {
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long currentUserId = userPrinciple.getUserId();
+
+        // 获取当前用户的所有帖子
+        List<Post> userPosts = postService.findAll().stream()
+                .filter(post -> post.getUserId().equals(currentUserId) && "Published".equals(post.getStatus()))
+                .collect(Collectors.toList());
+
+        // 按回复数量排序并取前 3 个帖子
+        List<Post> topPosts = userPosts.stream()
+                .sorted((post1, post2) -> Integer.compare(post2.getPostReplies().size(), post1.getPostReplies().size()))
+                .limit(3)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(topPosts);
+    }
+
+    @GetMapping("/unpublished-posts")
+    public ResponseEntity<List<Post>> getUnpublishedPosts() {
+        UserPrinciple userPrinciple = getUserIdFromJWT();
+        Long currentUserId = userPrinciple.getUserId();
+
+        // 获取当前用户的所有未发布帖子
+        List<Post> unpublishedPosts = postService.findAll().stream()
+                .filter(post -> post.getUserId().equals(currentUserId) && "Unpublished".equals(post.getStatus()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(unpublishedPosts);
+    }
+
     // ========== 私有辅助方法 ==========
 
     private UserPrinciple getUserIdFromJWT() {
