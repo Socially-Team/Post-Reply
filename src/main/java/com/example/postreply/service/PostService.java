@@ -1,6 +1,7 @@
 package com.example.postreply.service;
 
 
+import com.example.postreply.AOP.Exceptions.NotFoundException;
 import com.example.postreply.PostRepository;
 import com.example.postreply.model.Post;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class PostService {
      * 根据 postId 获取帖子，如未找到则抛出异常
      */
     public Post getPostById(String postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        return postRepository.findById(postId).orElseThrow(() -> new NotFoundException("Post not found"));
     }
 
     /**

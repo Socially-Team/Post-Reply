@@ -3,6 +3,7 @@ package com.example.postreply.controller;
 import com.example.postreply.model.Post;
 import com.example.postreply.security.UserPrinciple;
 import com.example.postreply.service.PostService;
+import com.example.postreply.AOP.Exceptions.*;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +81,7 @@ public class PostController {
         Post post = postService.getPostById(postId);
         if (!canViewPost(post)) {
             // 如果当前用户无权查看（根据状态和角色判断）
-            return ResponseEntity.status(403).build();
+            throw new ForbiddenException("Access denied!");
         }
         return ResponseEntity.ok(post);
     }
@@ -98,7 +99,7 @@ public class PostController {
         Long ownerId = post.getUserId();
 
         if (!canChangeStatus(currentStatus, status, currentUserId, ownerId, isAdmin, isSuperAdmin)) {
-            return ResponseEntity.status(403).body(null);
+            throw new ForbiddenException("Access denied!");
         }
 
         post.setStatus(status);
@@ -201,7 +202,7 @@ public class PostController {
 
         // 检查帖子是否存在
         if (post == null) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Post not found!");
         }
 
         // 返回帖子的 userId
