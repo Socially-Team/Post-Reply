@@ -1,5 +1,6 @@
 package com.example.postreply.controller;
 
+import com.example.postreply.AOP.Exceptions.ForbiddenException;
 import com.example.postreply.model.Post;
 import com.example.postreply.security.UserPrinciple;
 import com.example.postreply.service.PostService;
@@ -43,7 +44,7 @@ public class ReplyController {
 
         // 检查是否可添加回复
         if (!canAddReply(post)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot add reply: Post not in a state that allows replies.");
+            throw new ForbiddenException("Cannot add reply: Post not in a state that allows replies.");
         }
 
         reply.setUserId(userId);
@@ -67,7 +68,7 @@ public class ReplyController {
 
         // 检查是否可添加子回复
         if (!canAddReply(post)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot add sub-reply: Post not in a state that allows replies.");
+            throw new ForbiddenException("Cannot add sub-reply: Post not in a state that allows replies.");
         }
 
         subReply.setUserId(userId);
@@ -91,7 +92,7 @@ public class ReplyController {
 
         // 检查是否有权限删除回复（管理员或帖子拥有者）
         if (!canDeleteReply(post, userId, isAdmin)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No permission to delete this reply.");
+            throw new ForbiddenException("No permission to delete this reply.");
         }
 
         postService.deleteReply(postId, replyIndex, userId, isAdmin);
