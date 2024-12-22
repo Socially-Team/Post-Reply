@@ -114,6 +114,35 @@
 <!--            <scope>runtime</scope>-->
 <!--        </dependency>-->
 
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.7</version>
+            <type>maven-plugin</type>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -134,6 +163,41 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <!--	for testing		-->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <configuration>
+                    <!--					<excludes>-->
+                    <!--						<exclude>**/domain/**</exclude>-->
+                    <!--						<exclude>**/config/**</exclude>-->
+                    <!--					</excludes>-->
+                    <includes>
+                        <include>com/example/postreply/service/*</include>
+                        <include>com/example/postreply/controller/*</include>
+                    </includes>
+
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- enable Jacoco to listen to the JVM-->
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- attached to Maven test phase -->
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>
