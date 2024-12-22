@@ -53,6 +53,23 @@ public class PostControllerTest {
                 .username("testuser")
                 .role("USER")
                 .build();
+//        ROLE_SUPER_ADMIN
+
+        Mockito.when(authentication.getPrincipal()).thenReturn(userPrinciple);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    void mockAuthentication(Long userId, String role){
+        // Mock SecurityContext and Authentication
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+        UserPrinciple userPrinciple = UserPrinciple.builder()
+                .userId(userId)
+                .username("testuser")
+                .role(role)
+                .build();
+//        ROLE_SUPER_ADMIN
 
         Mockito.when(authentication.getPrincipal()).thenReturn(userPrinciple);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -79,6 +96,30 @@ public class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$.userId").value("1"))
                 .andExpect(jsonPath("$.status").value("Unpublished"));
+    }
+
+    @Test
+    void shouldUpdatePostStatus() throws Exception{
+
+        mockAuthentication(3L, "ROLE_SUPER_ADMIN");
+
+        Post post = new Post();
+        post.setPostId("1");
+        post.setUserId(3L);
+        post.setStatus("Published");
+        post.setContent("Test content");
+
+        Mockito.when(postService.getPostById("1")).thenReturn(post);
+        Mockito.when(postService.savePost(Mockito.any(Post.class))).thenReturn(post);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/posts/1/status")
+                        .param("status", "Hidden")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("Hidden"));
+
+        // Verify interactions
+        Mockito.verify(postService, Mockito.times(1)).getPostById("1");
     }
 
 }
